@@ -7,7 +7,6 @@
 <title>OMAR ARCHITECT | طلب تصميم</title>
 
 <!-- PDF generation is done in the customer's browser so Arabic/RTL is rendered by the browser itself. -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
 :root{
@@ -424,7 +423,30 @@ function buildBrief(projectNumber,team=false,uploaded=[]){
  const sub=team?"Design Brief":"Client & Project Brief · Internal";
  return `<div class="pdf-sheet"><div class="pdf-header"><img class="pdf-logo" src="${LOGO}"><div class="pdf-id"><small>PROJECT BRIEF</small><strong>${projectNumber}</strong></div></div><div class="pdf-hero"><h1>${title}</h1><p>${sub}</p></div><div class="pdf-summary"><div class="box"><div class="lab">المدينة</div><div class="val">${esc(state.city||"—")}</div></div><div class="box"><div class="lab">نوع المشروع</div><div class="val">${esc(project)}</div></div><div class="box"><div class="lab">الخدمات</div><div class="val">${esc(list(L.services,state.services))}</div></div></div>${sections.join("")}<div class="pdf-footer">${team?"DESIGN BRIEF": "CONFIDENTIAL · INTERNAL USE"}</div></div>`;
 }
+async function ensureHtml2Pdf(){
+ if(window.html2pdf) return;
+ const urls=[
+  "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js",
+  "https://unpkg.com/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"
+ ];
+ let lastError;
+ for(const url of urls){
+  try{
+   await new Promise((resolve,reject)=>{
+    const script=document.createElement("script");
+    script.src=url; script.async=true;
+    script.onload=()=>resolve();
+    script.onerror=()=>reject(new Error("PDF library failed to load"));
+    document.head.appendChild(script);
+   });
+   if(window.html2pdf) return;
+  }catch(e){ lastError=e; }
+ }
+ throw lastError||new Error("تعذر تحميل أداة إنشاء PDF");
+}
+
 async function htmlToPdfBlob(html,name){
+ await ensureHtml2Pdf();
  const stage=document.getElementById("pdfStage");stage.innerHTML=html;
  const el=stage.firstElementChild;
  const options={margin:0,filename:name,image:{type:"jpeg",quality:.95},html2canvas:{scale:1.55,useCORS:true,backgroundColor:"#ffffff",logging:false},jsPDF:{unit:"pt",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:[".pdf-section"]}};
