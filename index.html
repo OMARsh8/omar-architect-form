@@ -101,9 +101,10 @@ input:focus,textarea:focus,select:focus{border-color:#a69b90;box-shadow:0 0 0 3p
 .max-note{font-size:11px;color:#91877f;margin-top:10px}
 
 /* Hidden PDF canvas */
-#pdfStage{position:absolute;left:-10000px;top:0;width:794px;background:#fff;pointer-events:none}
+#pdfStage{position:fixed;left:0;top:0;width:794px;background:#fff;pointer-events:none;z-index:-2147483647}
 .pdf-sheet{width:794px;background:#fff;color:#171717;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;direction:rtl}
-.pdf-page{width:794px;height:1123px;background:#fff;color:#171717;padding:54px 54px 60px;box-sizing:border-box;overflow:hidden;position:relative}
+.pdf-page{width:794px;height:1120px;background:#fff;color:#171717;padding:54px 54px 60px;box-sizing:border-box;overflow:hidden;position:relative;break-after:page;page-break-after:always}
+.pdf-page:last-child{break-after:auto;page-break-after:auto}
 .pdf-page-content{height:100%;overflow:hidden}
 .pdf-page .pdf-footer{position:absolute;right:54px;left:54px;bottom:28px;margin:0}
 .pdf-header{display:flex;direction:ltr;justify-content:space-between;align-items:flex-start;margin-bottom:36px}
@@ -441,37 +442,97 @@ function _newPdfPage(stage, footerText){
  return {page,content};
 }
 function _fitsPdfPage(content){return content.scrollHeight<=content.clientHeight+1}
+function _makePdfSectionPart(heading){
+ const part=document.createElement("section");part.className="pdf-section";
+ if(heading)part.appendChild(heading.cloneNode(true));
+ const card=document.createElement("div");card.className="pdf-card";part.appendChild(card);
+ return {part,card};
+}
+function _fitRowText(row,remaining,card,content,isContinuation){
+ const probe=row.cloneNode(true);
+ const val=probe.querySelector(".pdf-value");
+ const lab=probe.querySelector(".pdf-label");
+ if(lab&&isContinuation)lab.textContent="تابع";
+ let lo=1,hi=remaining.length,best=0,bestCut=0;
+ while(lo<=hi){
+  const mid=Math.floor((lo+hi)/2);
+  let cut=mid;
+  if(mid<remaining.length){
+   const ws=Math.max(remaining.lastIndexOf(" ",mid),remaining.lastIndexOf("،",mid),remaining.lastIndexOf("/",mid));
+   if(ws>Math.floor(mid*.55))cut=ws+1;
+  }
+  if(val)val.textContent=remaining.slice(0,cut).trim();
+  card.appendChild(probe);
+  const fits=_fitsPdfPage(content);
+  card.removeChild(probe);
+  if(fits){best=mid;bestCut=cut;lo=mid+1}else hi=mid-1;
+ }
+ if(!bestCut)return null;
+ if(val)val.textContent=remaining.slice(0,bestCut).trim();
+ return {node:probe,cut:bestCut};
+}
+function _appendOversizeRow(row,ctx,partCard,stage,footerText,heading){
+ const value=row.querySelector(".pdf-value");
+ const raw=(value?.textContent||"").trim();
+ if(!raw){partCard.appendChild(row.cloneNode(true));return ctx}
+ let remaining=raw,continuation=false;
+ while(remaining.length){
+  let fitted=_fitRowText(row,remaining,partCard,ctx.content,continuation);
+  if(!fitted){
+   ctx=_newPdfPage(stage,footerText);
+   const fresh=_makePdfSectionPart(heading);ctx.content.appendChild(fresh.part);partCard=fresh.card;
+   fitted=_fitRowText(row,remaining,partCard,ctx.content,continuation);
+  }
+  if(!fitted){
+   // Defensive fallback: never create an empty/infinite page loop.
+   const forced=row.cloneNode(true),v=forced.querySelector(".pdf-value"),l=forced.querySelector(".pdf-label");
+   if(l&&continuation)l.textContent="تابع";
+   const cut=Math.min(300,remaining.length);if(v)v.textContent=remaining.slice(0,cut);
+   partCard.appendChild(forced);remaining=remaining.slice(cut).trim();
+  }else{
+   partCard.appendChild(fitted.node);remaining=remaining.slice(fitted.cut).trim();
+  }
+  continuation=true;
+  if(remaining.length){ctx=_newPdfPage(stage,footerText);const fresh=_makePdfSectionPart(heading);ctx.content.appendChild(fresh.part);partCard=fresh.card}
+ }
+ return ctx;
+}
 function _appendSectionAcrossPages(section,ctx,stage,footerText){
  const clone=section.cloneNode(true);
  ctx.content.appendChild(clone);
- if(_fitsPdfPage(ctx.content)) return ctx;
+ if(_fitsPdfPage(ctx.content))return ctx;
  ctx.content.removeChild(clone);
- // Most sections fit intact. If one does not, move it to a fresh page first.
- if(ctx.content.children.length){ctx=_newPdfPage(stage,footerText);ctx.content.appendChild(clone);if(_fitsPdfPage(ctx.content))return ctx;ctx.content.removeChild(clone)}
- // Split long row-based cards cleanly between pages.
- const card=section.querySelector(".pdf-card"), heading=section.querySelector("h3");
+ // Keep normal sections intact when they fit on a fresh page.
+ if(ctx.content.children.length){
+  const freshCtx=_newPdfPage(stage,footerText);freshCtx.content.appendChild(clone);
+  if(_fitsPdfPage(freshCtx.content))return freshCtx;
+  freshCtx.content.removeChild(clone);ctx=freshCtx;
+ }
+ // Split row-based cards only between rows. A single exceptionally long row
+ // is split by measured text chunks, so user-entered notes cannot overflow.
+ const card=section.querySelector(".pdf-card"),heading=section.querySelector("h3");
  if(card){
   const rows=[...card.children];
-  let part=null,partCard=null;
+  let partInfo=_makePdfSectionPart(heading),part=partInfo.part,partCard=partInfo.card;
+  ctx.content.appendChild(part);
   for(const row of rows){
-   if(!part){
-    part=document.createElement("section");part.className="pdf-section";
-    if(heading)part.appendChild(heading.cloneNode(true));
-    partCard=document.createElement("div");partCard.className="pdf-card";part.appendChild(partCard);ctx.content.appendChild(part);
+   const copy=row.cloneNode(true);partCard.appendChild(copy);
+   if(_fitsPdfPage(ctx.content))continue;
+   partCard.removeChild(copy);
+   // If this page already has rows, move this row to the next page first.
+   if(partCard.children.length){
+    ctx=_newPdfPage(stage,footerText);partInfo=_makePdfSectionPart(heading);part=partInfo.part;partCard=partInfo.card;ctx.content.appendChild(part);
+    partCard.appendChild(copy);
+    if(_fitsPdfPage(ctx.content))continue;
+    partCard.removeChild(copy);
    }
-   partCard.appendChild(row.cloneNode(true));
-   if(!_fitsPdfPage(ctx.content)){
-    partCard.removeChild(partCard.lastElementChild);
-    ctx=_newPdfPage(stage,footerText);
-    part=document.createElement("section");part.className="pdf-section";
-    if(heading)part.appendChild(heading.cloneNode(true));
-    partCard=document.createElement("div");partCard.className="pdf-card";part.appendChild(partCard);ctx.content.appendChild(part);
-    partCard.appendChild(row.cloneNode(true));
-   }
+   ctx=_appendOversizeRow(row,ctx,partCard,stage,footerText,heading);
+   // Rebind to the card on the current page after a possible multi-page row split.
+   part=ctx.content.lastElementChild;partCard=part?.querySelector(".pdf-card")||partCard;
   }
   return ctx;
  }
- // Final fallback: place the section on its own page without clipping previous content.
+ // Fixed-size note sections are moved to their own page. They are short by design.
  ctx=_newPdfPage(stage,footerText);ctx.content.appendChild(section.cloneNode(true));return ctx;
 }
 async function htmlToPdfBlob(html,name){
@@ -482,26 +543,58 @@ async function htmlToPdfBlob(html,name){
  const header=sheet.querySelector(".pdf-header"),hero=sheet.querySelector(".pdf-hero"),summary=sheet.querySelector(".pdf-summary");
  const sections=[...sheet.querySelectorAll(":scope > .pdf-section")];
  let ctx=_newPdfPage(stage,footerText);
- for(const node of [header,hero,summary]) if(node) ctx.content.appendChild(node.cloneNode(true));
- for(const section of sections) ctx=_appendSectionAcrossPages(section,ctx,stage,footerText);
- // Remove any accidental empty page.
+ for(const node of [header,hero,summary])if(node)ctx.content.appendChild(node.cloneNode(true));
+ for(const section of sections)ctx=_appendSectionAcrossPages(section,ctx,stage,footerText);
  [...stage.querySelectorAll(".pdf-page")].forEach(p=>{if(!p.querySelector(".pdf-page-content").children.length)p.remove()});
  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
  if(document.fonts?.ready)try{await document.fonts.ready}catch(_){ }
  const imgs=[...stage.querySelectorAll("img")];
  await Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(res=>{img.onload=img.onerror=()=>res()})));
- const JsPDF=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
- if(!JsPDF)throw new Error("تعذر تشغيل مولد PDF");
- const pdf=new JsPDF({unit:"pt",format:"a4",orientation:"portrait",compress:true});
+ if(typeof html2pdf!=="function")throw new Error("تعذر تشغيل مولد PDF");
  const pages=[...stage.querySelectorAll(".pdf-page")];
- for(let i=0;i<pages.length;i++){
-  const canvas=await html2canvas(pages[i],{scale:1.65,useCORS:true,backgroundColor:"#ffffff",logging:false,scrollX:0,scrollY:0});
-  const data=canvas.toDataURL("image/jpeg",0.94);
-  if(i>0)pdf.addPage("a4","portrait");
-  pdf.addImage(data,"JPEG",0,0,595.28,841.89,undefined,"FAST");
+ try{
+  if(!pages.length)throw new Error("PDF layout has no pages");
+  for(const p of pages){
+   const c=p.querySelector(".pdf-page-content");
+   if(!c||!c.children.length)throw new Error("PDF layout contains an empty page");
+   if(c.scrollHeight>c.clientHeight+1)throw new Error("PDF layout overflow detected");
+  }
+  const firstText=(pages[0].querySelector(".pdf-page-content")?.innerText||"").trim();
+  if(firstText.length<20)throw new Error("PDF first page is unexpectedly empty");
+
+  // Render one prepared A4 page at a time. This avoids the html2pdf long-canvas
+  // pagination bug that produced a blank first page and split tables mid-row.
+  const renderOpt={
+   margin:0,
+   image:{type:"jpeg",quality:.95},
+   html2canvas:{scale:1.6,useCORS:true,backgroundColor:"#ffffff",logging:false,scrollX:0,scrollY:0,windowWidth:794},
+   jsPDF:{unit:"pt",format:"a4",orientation:"portrait",compress:true},
+   pagebreak:{mode:[]}
+  };
+  const firstWorker=html2pdf().set(renderOpt).from(pages[0]).toPdf();
+  const pdf=await firstWorker.get("pdf");
+  if(!pdf)throw new Error("PDF engine did not return a document");
+  // The first prepared page must map to exactly one PDF page.
+  if(pdf.internal?.getNumberOfPages&&pdf.internal.getNumberOfPages()!==1)throw new Error("First PDF page rendered as multiple pages");
+  const pageW=pdf.internal.pageSize.getWidth(),pageH=pdf.internal.pageSize.getHeight();
+  for(let i=1;i<pages.length;i++){
+   const worker=html2pdf().set(renderOpt).from(pages[i]).toCanvas();
+   const canvas=await worker.get("canvas");
+   if(!canvas||!canvas.width||!canvas.height)throw new Error(`Canvas rendering failed on page ${i+1}`);
+   pdf.addPage("a4","portrait");
+   const img=canvas.toDataURL("image/jpeg",.95);
+   pdf.addImage(img,"JPEG",0,0,pageW,pageH,undefined,"FAST");
+  }
+  if(pdf.internal?.getNumberOfPages&&pdf.internal.getNumberOfPages()!==pages.length)throw new Error("PDF page count mismatch");
+  const blob=pdf.output("blob");
+  if(!blob||blob.size<10000)throw new Error("PDF output is unexpectedly small");
+  stage.innerHTML="";
+  return blob;
+ }catch(err){
+  stage.innerHTML="";
+  console.error("PDF generation failed:",err);
+  throw new Error("تعذر إنشاء ملف PDF. حاول مرة أخرى.");
  }
- stage.innerHTML="";
- return pdf.output("blob");
 }
 async function uploadBrief(blob,path){
  const res=await fetch(`${SUPABASE_URL}/storage/v1/object/project-briefs/${encodePath(path)}`,{
