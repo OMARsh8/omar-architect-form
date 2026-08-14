@@ -101,11 +101,11 @@ input:focus,textarea:focus,select:focus{border-color:#a69b90;box-shadow:0 0 0 3p
 .max-note{font-size:11px;color:#91877f;margin-top:10px}
 
 /* Hidden PDF canvas */
-#pdfStage{position:fixed;left:0;top:0;width:794px;background:#fff;pointer-events:none;z-index:-2147483647}
+#pdfStage{position:absolute;left:0;top:0;width:794px;min-width:794px;background:#fff;pointer-events:none;z-index:-2147483647;overflow:visible;direction:ltr}
 .pdf-sheet{width:794px;background:#fff;color:#171717;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;direction:rtl}
-.pdf-page{width:794px;height:1120px;background:#fff;color:#171717;padding:54px 54px 60px;box-sizing:border-box;overflow:hidden;position:relative;break-after:page;page-break-after:always}
+.pdf-page{width:794px;height:1123px;direction:rtl;background:#fff;color:#171717;padding:54px 54px 60px;box-sizing:border-box;overflow:hidden;position:relative;break-after:page;page-break-after:always}
 .pdf-page:last-child{break-after:auto;page-break-after:auto}
-.pdf-page-content{height:100%;overflow:hidden}
+.pdf-page-content{height:100%;overflow:hidden;min-width:0}
 .pdf-page .pdf-footer{position:absolute;right:54px;left:54px;bottom:28px;margin:0}
 .pdf-header{display:flex;direction:ltr;justify-content:space-between;align-items:flex-start;margin-bottom:36px}
 .pdf-logo{width:155px;height:auto}
@@ -116,19 +116,19 @@ input:focus,textarea:focus,select:focus{border-color:#a69b90;box-shadow:0 0 0 3p
 .pdf-hero h1{margin:0 0 8px;font-size:31px;line-height:1.35}
 .pdf-hero p{margin:0;font-size:12px;color:#897d70}
 .pdf-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:34px}
-.pdf-summary .box{background:#f7f3ec;border:1px solid #e5ddcf;border-radius:11px;padding:13px;min-height:68px}
+.pdf-summary .box{min-width:0;background:#f7f3ec;border:1px solid #e5ddcf;border-radius:11px;padding:13px;min-height:68px}
 .pdf-summary .lab{font-size:10px;font-weight:800;color:#968672;margin-bottom:5px}
 .pdf-summary .val{font-size:13px;font-weight:800;line-height:1.55}
-.pdf-section{margin-bottom:26px;page-break-inside:avoid}
+.pdf-section{margin-bottom:20px;page-break-inside:avoid}
 .pdf-section h3{font-size:17px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
 .pdf-section h3:before{content:"";display:inline-block;width:21px;height:2px;background:#b4936b}
 .pdf-card{border:1px solid #e8e1d7;border-radius:11px;overflow:hidden}
-.pdf-row{display:grid;grid-template-columns:72% 28%;direction:ltr;min-height:42px;border-bottom:1px solid #eee8df;align-items:stretch}
+.pdf-row{display:grid;min-width:0;grid-template-columns:72% 28%;direction:ltr;min-height:42px;border-bottom:1px solid #eee8df;align-items:stretch}
 .pdf-row:last-child{border-bottom:0}
-.pdf-label{grid-column:2;direction:rtl;text-align:right;background:#fbfaf7;color:#837765;font-size:11px;font-weight:800;padding:10px 12px;display:flex;align-items:center}
-.pdf-value{grid-column:1;direction:rtl;text-align:right;color:#26221e;font-size:11.5px;padding:10px 13px;display:flex;align-items:center;line-height:1.75;overflow-wrap:anywhere}
+.pdf-label{grid-column:2;min-width:0;direction:rtl;text-align:right;background:#fbfaf7;color:#837765;font-size:11px;font-weight:800;padding:10px 12px;display:flex;align-items:center}
+.pdf-value{grid-column:1;min-width:0;direction:rtl;text-align:right;color:#26221e;font-size:11.5px;padding:10px 13px;display:flex;align-items:center;line-height:1.75;overflow-wrap:anywhere}
 .pdf-value.ltr{direction:ltr;text-align:left;font-family:Arial,sans-serif}
-.pdf-note{background:#f7f3ec;border:1px solid #e5ddcf;border-right:3px solid #b4936b;border-radius:10px;padding:12px 14px;font-size:11.5px;line-height:1.9}
+.pdf-note{background:#f7f3ec;border:1px solid #e5ddcf;border-right:3px solid #b4936b;border-radius:10px;padding:10px 14px;font-size:11.5px;line-height:1.8}
 .pdf-footer{margin-top:28px;color:#9a8e80;font:700 9px Arial,sans-serif;direction:ltr;text-align:left;letter-spacing:.7px}
 @media(max-width:480px){h2{font-size:26px}.counter-grid{grid-template-columns:1fr}.screen{padding-top:28px}.hero-title{font-size:27px}}
 </style>
@@ -537,6 +537,11 @@ function _appendSectionAcrossPages(section,ctx,stage,footerText){
 }
 async function htmlToPdfBlob(html,name){
  const stage=document.getElementById("pdfStage");stage.innerHTML="";
+ // Force a true 794px layout viewport while preparing/rendering the PDF.
+ // Mobile Safari otherwise clips fixed/oversized DOM to the phone viewport.
+ const root=document.documentElement,body=document.body;
+ const prev={rootMin:root.style.minWidth,rootDir:root.getAttribute("dir"),bodyMin:body.style.minWidth,bodyDir:body.style.direction,bodyOverflowX:body.style.overflowX,stageLeft:stage.style.left,stageTop:stage.style.top};
+ root.setAttribute("dir","ltr");root.style.minWidth="794px";body.style.direction="ltr";body.style.minWidth="794px";body.style.overflowX="visible";stage.style.left="0px";stage.style.top=`${window.scrollY||0}px`;window.scrollTo(0,0);
  const source=document.createElement("div");source.innerHTML=html;
  const sheet=source.firstElementChild;
  const footerText=(sheet.querySelector(".pdf-footer")?.textContent||"").trim();
@@ -557,41 +562,62 @@ async function htmlToPdfBlob(html,name){
   for(const p of pages){
    const c=p.querySelector(".pdf-page-content");
    if(!c||!c.children.length)throw new Error("PDF layout contains an empty page");
-   if(c.scrollHeight>c.clientHeight+1)throw new Error("PDF layout overflow detected");
+   if(c.scrollHeight>c.clientHeight+1)throw new Error("PDF layout vertical overflow detected");
+   if(c.scrollWidth>c.clientWidth+1)throw new Error("PDF layout horizontal overflow detected");
+   const r=p.getBoundingClientRect();
+   if(Math.abs(r.width-794)>1||Math.abs(r.height-1123)>1)throw new Error(`PDF page geometry invalid: ${r.width}x${r.height}`);
   }
-  const firstText=(pages[0].querySelector(".pdf-page-content")?.innerText||"").trim();
-  if(firstText.length<20)throw new Error("PDF first page is unexpectedly empty");
-
-  // Render one prepared A4 page at a time. This avoids the html2pdf long-canvas
-  // pagination bug that produced a blank first page and split tables mid-row.
   const renderOpt={
    margin:0,
-   image:{type:"jpeg",quality:.95},
-   html2canvas:{scale:1.6,useCORS:true,backgroundColor:"#ffffff",logging:false,scrollX:0,scrollY:0,windowWidth:794},
+   image:{type:"jpeg",quality:.96},
+   html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff",logging:false,scrollX:0,scrollY:0,windowWidth:794,windowHeight:1123},
    jsPDF:{unit:"pt",format:"a4",orientation:"portrait",compress:true},
    pagebreak:{mode:[]}
   };
-  const firstWorker=html2pdf().set(renderOpt).from(pages[0]).toPdf();
-  const pdf=await firstWorker.get("pdf");
-  if(!pdf)throw new Error("PDF engine did not return a document");
-  // The first prepared page must map to exactly one PDF page.
-  if(pdf.internal?.getNumberOfPages&&pdf.internal.getNumberOfPages()!==1)throw new Error("First PDF page rendered as multiple pages");
+
+  // html2pdf bundles jsPDF but does not reliably expose it as window.jsPDF.
+  // Obtain the constructor from a temporary worker, then discard its auto-laid-out page.
+  const seedWorker=html2pdf().set(renderOpt).from(pages[0]).toPdf();
+  const seedPdf=await seedWorker.get("pdf");
+  if(!seedPdf||!seedPdf.constructor)throw new Error("PDF engine unavailable");
+  const JsPDF=seedPdf.constructor;
+  const pdf=new JsPDF({unit:"pt",format:"a4",orientation:"portrait",compress:true});
   const pageW=pdf.internal.pageSize.getWidth(),pageH=pdf.internal.pageSize.getHeight();
-  for(let i=1;i<pages.length;i++){
+
+  for(let i=0;i<pages.length;i++){
+   // Two corner markers let us verify that html2canvas captured BOTH edges of the 794px page.
+   // This specifically catches the iPhone/Safari half-page crop that affected OA-2026-007.
+   const leftMark=document.createElement("i"),rightMark=document.createElement("i");
+   for(const [el,side] of [[leftMark,"left"],[rightMark,"right"]]){
+    el.setAttribute("data-pdf-edge",side);Object.assign(el.style,{position:"absolute",top:"4px",width:"5px",height:"5px",background:"rgb(255,0,255)",zIndex:"999999"});el.style[side]="4px";pages[i].appendChild(el);
+   }
    const worker=html2pdf().set(renderOpt).from(pages[i]).toCanvas();
    const canvas=await worker.get("canvas");
    if(!canvas||!canvas.width||!canvas.height)throw new Error(`Canvas rendering failed on page ${i+1}`);
-   pdf.addPage("a4","portrait");
-   const img=canvas.toDataURL("image/jpeg",.95);
+   const ratio=canvas.width/canvas.height;
+   if(ratio<0.70||ratio>0.72)throw new Error(`Unexpected canvas aspect ratio on page ${i+1}: ${ratio}`);
+   const ctx2=canvas.getContext("2d",{willReadFrequently:true});
+   const hasMagenta=(x0,x1,y0,y1)=>{const d=ctx2.getImageData(Math.max(0,x0),Math.max(0,y0),Math.max(1,x1-x0),Math.max(1,y1-y0)).data;for(let k=0;k<d.length;k+=4)if(d[k]>220&&d[k+1]<45&&d[k+2]>220)return true;return false};
+   const sx=canvas.width/794,sy=canvas.height/1123;
+   const leftOK=hasMagenta(0,Math.ceil(18*sx),0,Math.ceil(18*sy));
+   const rightOK=hasMagenta(Math.floor(canvas.width-18*sx),canvas.width,0,Math.ceil(18*sy));
+   leftMark.remove();rightMark.remove();
+   if(!leftOK||!rightOK)throw new Error(`PDF horizontal capture failed on page ${i+1}`);
+   // Erase validation dots from the final image.
+   ctx2.fillStyle="#ffffff";ctx2.fillRect(0,0,Math.ceil(18*sx),Math.ceil(18*sy));ctx2.fillRect(Math.floor(canvas.width-18*sx),0,Math.ceil(18*sx),Math.ceil(18*sy));
+   if(i>0)pdf.addPage("a4","portrait");
+   const img=canvas.toDataURL("image/jpeg",.96);
    pdf.addImage(img,"JPEG",0,0,pageW,pageH,undefined,"FAST");
   }
   if(pdf.internal?.getNumberOfPages&&pdf.internal.getNumberOfPages()!==pages.length)throw new Error("PDF page count mismatch");
   const blob=pdf.output("blob");
   if(!blob||blob.size<10000)throw new Error("PDF output is unexpectedly small");
   stage.innerHTML="";
+  if(prev.rootDir===null)root.removeAttribute("dir");else root.setAttribute("dir",prev.rootDir);root.style.minWidth=prev.rootMin;body.style.direction=prev.bodyDir;body.style.minWidth=prev.bodyMin;body.style.overflowX=prev.bodyOverflowX;stage.style.left=prev.stageLeft;stage.style.top=prev.stageTop;
   return blob;
  }catch(err){
   stage.innerHTML="";
+  if(prev.rootDir===null)root.removeAttribute("dir");else root.setAttribute("dir",prev.rootDir);root.style.minWidth=prev.rootMin;body.style.direction=prev.bodyDir;body.style.minWidth=prev.bodyMin;body.style.overflowX=prev.bodyOverflowX;stage.style.left=prev.stageLeft;stage.style.top=prev.stageTop;
   console.error("PDF generation failed:",err);
   throw new Error("تعذر إنشاء ملف PDF. حاول مرة أخرى.");
  }
