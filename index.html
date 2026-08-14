@@ -101,8 +101,11 @@ input:focus,textarea:focus,select:focus{border-color:#a69b90;box-shadow:0 0 0 3p
 .max-note{font-size:11px;color:#91877f;margin-top:10px}
 
 /* Hidden PDF canvas */
-#pdfStage{position:fixed;left:-20000px;top:0;width:794px;background:#fff;z-index:-1}
-.pdf-sheet{width:794px;background:#fff;color:#171717;padding:54px 54px 60px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;direction:rtl}
+#pdfStage{position:absolute;left:-10000px;top:0;width:794px;background:#fff;pointer-events:none}
+.pdf-sheet{width:794px;background:#fff;color:#171717;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;direction:rtl}
+.pdf-page{width:794px;height:1123px;background:#fff;color:#171717;padding:54px 54px 60px;box-sizing:border-box;overflow:hidden;position:relative}
+.pdf-page-content{height:100%;overflow:hidden}
+.pdf-page .pdf-footer{position:absolute;right:54px;left:54px;bottom:28px;margin:0}
 .pdf-header{display:flex;direction:ltr;justify-content:space-between;align-items:flex-start;margin-bottom:36px}
 .pdf-logo{width:155px;height:auto}
 .pdf-id{text-align:left;direction:ltr;padding-top:5px}
@@ -424,14 +427,81 @@ function buildBrief(projectNumber,team=false,uploaded=[]){
  const sub=team?"Design Brief":"Client & Project Brief · Internal";
  return `<div class="pdf-sheet"><div class="pdf-header"><img class="pdf-logo" src="${LOGO}"><div class="pdf-id"><small>PROJECT BRIEF</small><strong>${projectNumber}</strong></div></div><div class="pdf-hero"><h1>${title}</h1><p>${sub}</p></div><div class="pdf-summary"><div class="box"><div class="lab">المدينة</div><div class="val">${esc(state.city||"—")}</div></div><div class="box"><div class="lab">نوع المشروع</div><div class="val">${esc(project)}</div></div><div class="box"><div class="lab">الخدمات</div><div class="val">${esc(list(L.services,state.services))}</div></div></div>${sections.join("")}<div class="pdf-footer">${team?"DESIGN BRIEF": "CONFIDENTIAL · INTERNAL USE"}</div></div>`;
 }
+function _newPdfPage(stage, footerText){
+ const page=document.createElement("div");
+ page.className="pdf-page";
+ const content=document.createElement("div");
+ content.className="pdf-page-content";
+ page.appendChild(content);
+ const footer=document.createElement("div");
+ footer.className="pdf-footer";
+ footer.textContent=footerText;
+ page.appendChild(footer);
+ stage.appendChild(page);
+ return {page,content};
+}
+function _fitsPdfPage(content){return content.scrollHeight<=content.clientHeight+1}
+function _appendSectionAcrossPages(section,ctx,stage,footerText){
+ const clone=section.cloneNode(true);
+ ctx.content.appendChild(clone);
+ if(_fitsPdfPage(ctx.content)) return ctx;
+ ctx.content.removeChild(clone);
+ // Most sections fit intact. If one does not, move it to a fresh page first.
+ if(ctx.content.children.length){ctx=_newPdfPage(stage,footerText);ctx.content.appendChild(clone);if(_fitsPdfPage(ctx.content))return ctx;ctx.content.removeChild(clone)}
+ // Split long row-based cards cleanly between pages.
+ const card=section.querySelector(".pdf-card"), heading=section.querySelector("h3");
+ if(card){
+  const rows=[...card.children];
+  let part=null,partCard=null;
+  for(const row of rows){
+   if(!part){
+    part=document.createElement("section");part.className="pdf-section";
+    if(heading)part.appendChild(heading.cloneNode(true));
+    partCard=document.createElement("div");partCard.className="pdf-card";part.appendChild(partCard);ctx.content.appendChild(part);
+   }
+   partCard.appendChild(row.cloneNode(true));
+   if(!_fitsPdfPage(ctx.content)){
+    partCard.removeChild(partCard.lastElementChild);
+    ctx=_newPdfPage(stage,footerText);
+    part=document.createElement("section");part.className="pdf-section";
+    if(heading)part.appendChild(heading.cloneNode(true));
+    partCard=document.createElement("div");partCard.className="pdf-card";part.appendChild(partCard);ctx.content.appendChild(part);
+    partCard.appendChild(row.cloneNode(true));
+   }
+  }
+  return ctx;
+ }
+ // Final fallback: place the section on its own page without clipping previous content.
+ ctx=_newPdfPage(stage,footerText);ctx.content.appendChild(section.cloneNode(true));return ctx;
+}
 async function htmlToPdfBlob(html,name){
- const stage=document.getElementById("pdfStage");stage.innerHTML=html;
- const el=stage.firstElementChild;
- const options={margin:0,filename:name,image:{type:"jpeg",quality:.95},html2canvas:{scale:1.55,useCORS:true,backgroundColor:"#ffffff",logging:false},jsPDF:{unit:"pt",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:[".pdf-section"]}};
- const worker=html2pdf().set(options).from(el).toPdf();
- const pdf=await worker.outputPdf("blob");
+ const stage=document.getElementById("pdfStage");stage.innerHTML="";
+ const source=document.createElement("div");source.innerHTML=html;
+ const sheet=source.firstElementChild;
+ const footerText=(sheet.querySelector(".pdf-footer")?.textContent||"").trim();
+ const header=sheet.querySelector(".pdf-header"),hero=sheet.querySelector(".pdf-hero"),summary=sheet.querySelector(".pdf-summary");
+ const sections=[...sheet.querySelectorAll(":scope > .pdf-section")];
+ let ctx=_newPdfPage(stage,footerText);
+ for(const node of [header,hero,summary]) if(node) ctx.content.appendChild(node.cloneNode(true));
+ for(const section of sections) ctx=_appendSectionAcrossPages(section,ctx,stage,footerText);
+ // Remove any accidental empty page.
+ [...stage.querySelectorAll(".pdf-page")].forEach(p=>{if(!p.querySelector(".pdf-page-content").children.length)p.remove()});
+ await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+ if(document.fonts?.ready)try{await document.fonts.ready}catch(_){ }
+ const imgs=[...stage.querySelectorAll("img")];
+ await Promise.all(imgs.map(img=>img.complete?Promise.resolve():new Promise(res=>{img.onload=img.onerror=()=>res()})));
+ const JsPDF=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
+ if(!JsPDF)throw new Error("تعذر تشغيل مولد PDF");
+ const pdf=new JsPDF({unit:"pt",format:"a4",orientation:"portrait",compress:true});
+ const pages=[...stage.querySelectorAll(".pdf-page")];
+ for(let i=0;i<pages.length;i++){
+  const canvas=await html2canvas(pages[i],{scale:1.65,useCORS:true,backgroundColor:"#ffffff",logging:false,scrollX:0,scrollY:0});
+  const data=canvas.toDataURL("image/jpeg",0.94);
+  if(i>0)pdf.addPage("a4","portrait");
+  pdf.addImage(data,"JPEG",0,0,595.28,841.89,undefined,"FAST");
+ }
  stage.innerHTML="";
- return pdf;
+ return pdf.output("blob");
 }
 async function uploadBrief(blob,path){
  const res=await fetch(`${SUPABASE_URL}/storage/v1/object/project-briefs/${encodePath(path)}`,{
