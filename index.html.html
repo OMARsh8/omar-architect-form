@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<title>OMAR ARCHITECT | طلب تصميم</title>
+
+<!-- PDF generation is done in the customer's browser so Arabic/RTL is rendered by the browser itself. -->
+
+<style>
+:root{
+  --ink:#111111;--paper:#f6f1e8;--card:#fffdfa;--muted:#766f68;
+  --line:#ddd4c8;--accent:#d8b894;--dark:#101111;--ok:#1f7a56;--err:#9a3d3d;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--dark);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;color:var(--ink)}
+button,input,textarea,select{font:inherit}
+button{-webkit-tap-highlight-color:transparent}
+.app{max-width:760px;margin:auto;min-height:100vh;background:var(--dark)}
+.top{
+  height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;
+  position:sticky;top:0;z-index:20;background:rgba(246,241,232,.97);
+  border-bottom:1px solid rgba(17,17,17,.08);backdrop-filter:blur(12px)
+}
+.top.hidden{display:none}
+.top img{width:118px;max-height:40px;object-fit:contain}
+.prog{display:flex;align-items:center;gap:8px;direction:ltr}
+.track{width:92px;height:2px;background:#d7cfc5;border-radius:99px;overflow:hidden}
+.fill{height:100%;background:var(--ink);width:0;transition:.3s}
+.pct{font-size:10px;color:#777}
+.screen{min-height:calc(100vh - 66px);background:var(--paper);padding:34px 20px 120px;position:relative}
+.screen.dark{min-height:100vh;background:linear-gradient(180deg,#101111 0%,#171818 100%);color:#fff;padding:0}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:42px 24px;position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 68% 24%,rgba(216,184,148,.13),transparent 30%),linear-gradient(135deg,transparent 0 47%,rgba(255,255,255,.03) 47% 48%,transparent 48% 100%);pointer-events:none}
+.hero img{width:290px;max-width:78%;position:relative;z-index:1;margin-bottom:54px;filter:invert(1)}
+.hero-title{position:relative;z-index:1;width:min(390px,92%);margin:auto;font-size:31px;font-weight:700;line-height:1.35;text-align:right}
+.hero-title .l1{display:block}
+.hero-title .l2{display:block;margin-right:46%;white-space:nowrap;margin-top:5px}
+.hero p{font-size:14px;line-height:1.95;color:#d1cbc3;max-width:420px;position:relative;z-index:1;margin:20px 0 0}
+.hero .start{margin-top:32px;width:100%;max-width:320px;background:var(--accent);color:var(--ink);min-height:56px;position:relative;z-index:2}
+.sectionhead{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:30px}
+.sectionhead img{width:124px;max-height:49px;object-fit:contain}
+.step{font-size:11px;color:#948c84}
+.eyebrow{font-size:10px;letter-spacing:.12em;color:#948c84;font-weight:700}
+h2{font-size:29px;line-height:1.45;margin:0 0 10px}
+.lead{font-size:14px;color:var(--muted);line-height:1.95;margin:0 0 22px}
+.options{display:grid;gap:11px;margin-top:18px}
+.option{display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:var(--card);border-radius:16px;padding:14px;min-height:62px;cursor:pointer;transition:.18s}
+.option.sel{background:var(--ink);color:#fff;border-color:var(--ink)}
+.option input{width:18px;height:18px;accent-color:#111;flex:0 0 auto}
+.option .text{flex:1}
+.option strong{display:block;font-size:15px}
+.option small{display:block;font-size:11px;color:#8e857d;margin-top:3px;line-height:1.6}
+.option.sel small{color:#bbb}
+.field{margin-top:18px}
+.field label{display:block;font-size:14px;font-weight:800;margin-bottom:8px}
+input[type=text],input[type=email],input[type=tel],input[type=url],textarea,select{width:100%;border:1px solid var(--line);background:#fff;border-radius:14px;padding:14px 15px;outline:none;font-size:16px}
+textarea{min-height:135px;resize:vertical;line-height:1.8}
+input:focus,textarea:focus,select:focus{border-color:#a69b90;box-shadow:0 0 0 3px rgba(216,184,148,.14)}
+.groupTitle{font-size:15px;font-weight:800;margin:26px 0 8px}
+.hint{font-size:12px;color:var(--muted);line-height:1.8}
+.counter-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+.counter-card{border:1px solid var(--line);border-radius:16px;background:#fff;padding:12px;text-align:center}
+.counter-card label{font-size:12px;line-height:1.6;display:block;min-height:40px}
+.counter{display:flex;align-items:center;justify-content:space-between;margin-top:8px;direction:ltr}
+.counter button{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:20px}
+.counter span{font-size:20px;font-weight:800}
+.upload{border:1px dashed #c9bfb4;border-radius:16px;background:#fff;padding:22px;text-align:center;color:var(--muted);margin-top:18px}
+.upload input{margin-top:12px;max-width:100%;width:100%}
+.file-list{font-size:12px;text-align:right;margin-top:12px;line-height:1.9}
+.file-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #eee7de}
+.file-item:last-child{border-bottom:0}
+.file-remove{border:0;background:transparent;color:#9a3d3d;font-weight:800;cursor:pointer}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(760px,100%);display:flex;gap:10px;padding:16px 20px calc(16px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--paper) 72%,rgba(246,241,232,.94) 86%,rgba(246,241,232,0));z-index:19}
+.btn{border:0;border-radius:14px;padding:15px 18px;font-weight:800;cursor:pointer}
+.nav .btn{flex:1}
+.primary{background:var(--ink);color:#fff}
+.secondary{background:#fff;border:1px solid var(--line);color:var(--ink)}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+.review{display:grid;gap:12px;margin-top:20px}
+.review-card{border:1px solid var(--line);background:#fff;border-radius:16px;padding:15px}
+.review-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:7px}
+.review-top b{font-size:13px}
+.edit-link{border:0;background:transparent;color:#806a52;font-size:12px;font-weight:800;cursor:pointer;padding:2px 0}
+.review-card span{font-size:13px;color:var(--muted);line-height:1.8;white-space:pre-wrap}
+.note-card{border:1px solid var(--line);border-radius:18px;background:#fff;padding:21px;line-height:2.05;color:#4f4943}
+.note-card strong{display:block;color:#111;margin-bottom:8px}
+.notice{margin-top:16px;padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.7;display:none}
+.notice.show{display:block}
+.notice.error{background:#f7e9e9;color:var(--err)}
+.notice.ok{background:#e8f4ef;color:var(--ok)}
+.thanks{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:42px 24px}
+.thanks-inner{width:min(460px,100%)}
+.check{width:68px;height:68px;border-radius:50%;border:1px solid var(--accent);display:grid;place-items:center;color:var(--accent);font-size:30px;margin:0 auto 28px}
+.thanks h2{color:#fff;font-size:32px}
+.thanks p{color:#d2ccc5;line-height:1.95}
+.thanks img{display:block;width:235px;max-width:72%;margin:38px auto 30px;filter:invert(1)}
+.thanks .home-btn{width:min(260px,100%);background:var(--accent);color:#111}
+.max-note{font-size:11px;color:#91877f;margin-top:10px}
+
+/* Hidden PDF canvas */
+#pdfStage{position:fixed;left:-20000px;top:0;width:794px;background:#fff;z-index:-1}
+.pdf-sheet{width:794px;background:#fff;color:#171717;padding:54px 54px 60px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;direction:rtl}
+.pdf-header{display:flex;direction:ltr;justify-content:space-between;align-items:flex-start;margin-bottom:36px}
+.pdf-logo{width:155px;height:auto}
+.pdf-id{text-align:left;direction:ltr;padding-top:5px}
+.pdf-id small{display:block;font:700 10px Arial,sans-serif;letter-spacing:2px;color:#988a78;margin-bottom:4px}
+.pdf-id strong{font:700 21px Arial,sans-serif}
+.pdf-hero{border-top:1px solid #222;padding-top:34px;margin-bottom:31px}
+.pdf-hero h1{margin:0 0 8px;font-size:31px;line-height:1.35}
+.pdf-hero p{margin:0;font-size:12px;color:#897d70}
+.pdf-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:34px}
+.pdf-summary .box{background:#f7f3ec;border:1px solid #e5ddcf;border-radius:11px;padding:13px;min-height:68px}
+.pdf-summary .lab{font-size:10px;font-weight:800;color:#968672;margin-bottom:5px}
+.pdf-summary .val{font-size:13px;font-weight:800;line-height:1.55}
+.pdf-section{margin-bottom:26px;page-break-inside:avoid}
+.pdf-section h3{font-size:17px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.pdf-section h3:before{content:"";display:inline-block;width:21px;height:2px;background:#b4936b}
+.pdf-card{border:1px solid #e8e1d7;border-radius:11px;overflow:hidden}
+.pdf-row{display:grid;grid-template-columns:72% 28%;direction:ltr;min-height:42px;border-bottom:1px solid #eee8df;align-items:stretch}
+.pdf-row:last-child{border-bottom:0}
+.pdf-label{grid-column:2;direction:rtl;text-align:right;background:#fbfaf7;color:#837765;font-size:11px;font-weight:800;padding:10px 12px;display:flex;align-items:center}
+.pdf-value{grid-column:1;direction:rtl;text-align:right;color:#26221e;font-size:11.5px;padding:10px 13px;display:flex;align-items:center;line-height:1.75;overflow-wrap:anywhere}
+.pdf-value.ltr{direction:ltr;text-align:left;font-family:Arial,sans-serif}
+.pdf-note{background:#f7f3ec;border:1px solid #e5ddcf;border-right:3px solid #b4936b;border-radius:10px;padding:12px 14px;font-size:11.5px;line-height:1.9}
+.pdf-footer{margin-top:28px;color:#9a8e80;font:700 9px Arial,sans-serif;direction:ltr;text-align:left;letter-spacing:.7px}
+@media(max-width:480px){h2{font-size:26px}.counter-grid{grid-template-columns:1fr}.screen{padding-top:28px}.hero-title{font-size:27px}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="pdfStage" aria-hidden="true"></div>
+
+<script>
+const SUPABASE_URL="https://wlelqfigegynvywmycxi.supabase.co";
+const SUPABASE_KEY="sb_publishable_fcaS-sLWVLZ2viwXleLkAQ_9yHEDGSB";
+const LOGO="data:image/png;base64,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QDMCRwAAAACgGYEjAAAAANCMwBEAAAAAaEbgCAAAAAA0I3AEAAAAAJoROAIAAAAAzQgcAQAAAIBmBI4AAAAAQDMCRwAAAACgGYEjAAAAANCMwBEAAAAAaEbgCAAAAAA0I3AEAAAAAJoROAIAAAAAzQgcAQAAAIBmBI4AAAAAQDMCRwAAAACgGYEjAAAAANCMwBEAAAAAaEbgCAAAAAA0I3AEAAAAAJoROAIAAAAAzQgcAQAAAIBmBI4AAAAAQDMCRwAAAACgGYEjAAAAANCMwBEAAAAAaEbgCAAAAAA0I3AEAAAAAJoROAIAAAAAzQgcAQAAAIBmBI4AAAAAQDMCRwAAAACgGYEjAAAAANCMwBEAAAAAaEbgCAAAAAA0I3AEAAAAAJoROAIAAAAAzQgcAQAAAIBmBI4AAAAAQDMCRwAAAACgGYEjAAAAANCMwBEAAAAAaEbgCAAAAAA0I3AEAAAAAJoROAIAAAAAzQgcAQAAAIBmBI4AAAAAQDMCRwAAAACgGYEjAAAAANCMwBEAAAAAaEbgCAAAAAA0I3AEAAAAAJoROAIAAAAAzQgcAQAAAIBmBI4AAAAAQDMCRwAAAACgGYEjAAAAANCMwBEAAAAAaEbgCAAAAAA0I3AEAAAAAJoROAIAAAAAzQgcAQAAAIBmBI4AAAAAQDMCRwAAAACgGYEjAAAAANCMwBEAAAAAaEbgCAAAAAA0I3AEAAAAAJoROAIAAAAAzQgcAQAAAIBmBI4AAAAAQDMCRwAAAACgGYEjAAAAANCMwBEAAAAAaEbgCAAAAAA0I3AEAAAAAJoROAIAAAAAzQgcAQAAAIBmBI4AAAAAQDMCRwAAAACgGYEjAAAAANCMwBEAAAAAaEbgCAAAAAA0I3AEAAAAAJoROAIAAAAAzQgcAQAAAIBmBI4AAAAAQDMCRwAAAACgGYEjAAAAANCMwBEAAAAAaEbgCAAAAAA0I3AEAAAAAJoROAIAAAAAzQgcAQAAAIBmBI4AAAAAQDMCRwAAAACgGYEjAAAAANCMwBEAAAAAaEbgCAAAAAA0I3AEAAAAAJoROAIAAAAAzQgcAQAAAIBmBI4AAAAAQDMCRwAAAACgGYEjAAAAANCMwBEAAAAAaOb/BxbgPF1zZzimAAAAAElFTkSuQmCC";
+
+const state={
+  services:[], projectType:"", commercialType:"", otherProject:"",
+  landInfo:"", locationLink:"",
+  usage:"", usageOther:"",
+  adults:0, children:0, specialUsers:0, growth:"",
+  lifestyle:[], lifestyleOther:"",
+  hospitalitySpaces:[], familySpaces:[], bedroomSpaces:[],
+  sonsRooms:0,daughtersRooms:0,otherRooms:0,bedroomOther:"",
+  serviceSpaces:[],serviceOther:"",
+  kitchenType:"",privacy:"",floors:"",elevator:"",
+  outdoorSpaces:[],outdoorOther:"",
+  interiorScope:[],interiorOther:"",interiorStatus:"",
+  priorities:[],priorityOther:"",
+  budgetStatus:"",budgetAmount:"",
+  startTime:"",hasTarget:"",targetDate:"",
+  notes:"",fullName:"",phone:"",email:"",city:"",
+  referral:"",referralOther:""
+};
+let current=0, selectedFiles=[], reviewReturn=false;
+
+const L={
+project:{
+ villa:"فيلا خاصة",resthouse:"استراحة",chalet:"شاليه / منزل عطلات",duplex:"دوبلكس",
+ apartment_building:"عمارة سكنية",apartment:"شقة",commercial:"مشروع تجاري",other:"أخرى"
+},
+services:{arch:"التصميم المعماري",interior:"التصميم الداخلي",landscape:"تصميم اللاندسكيب والمساحات الخارجية"},
+commercial:{office:"مكتب",restaurant:"مطعم / مقهى",store:"متجر / معرض",clinic:"عيادة",hospitality:"مشروع ضيافة",building:"مبنى تجاري",other:"أخرى"},
+usage:{primary:"مسكن رئيسي",secondary:"مسكن ثانوي",vacation:"منزل عطلات / موسمي",investment:"استثمار",shared:"استخدام عائلي مشترك",other:"أخرى"},
+growth:{yes:"نعم",no:"لا",unsure:"غير متأكد"},
+lifestyle:{guests:"نستقبل ضيوفًا بشكل متكرر",privacy:"نفضل الخصوصية العالية بين العائلة والضيوف",family_gathering:"نجتمع كأسرة بشكل مستمر",open:"نفضل المساحات المفتوحة والمترابطة",separate:"نفضل الفصل الواضح بين الفراغات",workstudy:"نعمل أو ندرس من المنزل",other:"أخرى"},
+hospitality:{men_majlis:"مجلس رجال",formal_dining:"مقلط / غرفة طعام رسمية",women_majlis:"مجلس نساء",guest_bedroom:"غرفة نوم ضيوف"},
+family:{family_hall:"صالة عائلية",family_dining:"غرفة طعام عائلية",living_room:"غرفة معيشة",office:"مكتب / غرفة دراسة",playroom:"غرفة ألعاب",cinema:"غرفة ترفيه / سينما"},
+bedroom:{master:"جناح رئيسي",sons:"غرف أبناء",daughters:"غرف بنات",other:"أخرى"},
+serviceSpaces:{maid:"غرفة عاملة منزلية",laundry:"غرفة غسيل",storage:"مستودع",driver:"غرفة سائق",service_entrance:"مدخل خدمة مستقل",other:"أخرى"},
+kitchen:{closed:"مطبخ مغلق",open:"مطبخ مفتوح",prep:"مطبخ رئيسي + مطبخ تحضيري",unsure:"غير متأكد"},
+privacy:{high:"خصوصية عالية وفصل واضح بين العائلة والضيوف",balanced:"خصوصية متوازنة",open:"انفتاح أكبر وترابط بين الفراغات",team:"أترك ذلك لتوصية فريق التصميم"},
+floors:{one:"دور واحد",two:"دورين",three_plus:"ثلاثة أدوار أو أكثر",team:"أترك ذلك لتوصية فريق التصميم"},
+elevator:{yes:"نعم",no:"لا",unsure:"غير متأكد"},
+outdoor:{seating:"جلسة خارجية",winter:"جلسة شتوية",bbq:"منطقة شواء / مطبخ خارجي",garden:"حديقة ومسطحات خضراء",privacy_trees:"أشجار للخصوصية",pool:"مسبح",water:"عنصر مائي",kids:"منطقة ألعاب أطفال",court:"ملعب",parking:"مواقف سيارات",shades:"مظلات",service_yard:"حوش خدمة",other:"أخرى"},
+interior:{full:"كامل المشروع",hospitality:"المجالس ومناطق الضيافة",living:"الصالات وغرف المعيشة",bedrooms:"غرف النوم",kitchen:"المطبخ",bathrooms:"الحمامات",office:"المكتب / غرفة الدراسة",other:"أخرى"},
+interiorStatus:{new:"مشروع جديد من الصفر",existing:"مبنى قائم يحتاج إعادة تصميم داخلي"},
+priority:{privacy:"الخصوصية",space_quality:"جودة واستغلال المساحات",natural_light:"الإضاءة الطبيعية",comfort:"الراحة وسهولة الاستخدام",spacious:"المساحات الواسعة",aesthetic:"الطابع الجمالي",maintenance:"سهولة الصيانة",future:"المرونة المستقبلية",cost:"ضبط تكلفة التنفيذ",other:"أخرى"},
+budget:{defined:"نعم، لدي ميزانية محددة",range:"لدي نطاق تقريبي",guidance:"لا، وأحتاج إلى توجيه مبدئي"},
+start:{asap:"في أقرب وقت",m1_3:"خلال 1–3 أشهر",m3_6:"خلال 3–6 أشهر",after6:"بعد 6 أشهر",none:"لا يوجد موعد محدد حاليًا"},
+yesno:{yes:"نعم",no:"لا"},
+referral:{social:"وسائل التواصل الاجتماعي",person:"توصية من شخص",previous:"عميل سابق",other:"أخرى"}
+};
+const a=(m,k)=>m?.[k]||k||"—";
+const list=(m,arr)=>arr?.length?arr.map(x=>a(m,x)).join("، "):"—";
+const has=(arr,v)=>Array.isArray(arr)&&arr.includes(v);
+const isResidential=()=>state.projectType && state.projectType!=="commercial" && state.projectType!=="other";
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+
+function top(progress=0){
+ return `<header class="top"><img src="${LOGO}" alt="OMAR ARCHITECT"><div class="prog"><div class="track"><div class="fill" style="width:${progress}%"></div></div><div class="pct">${progress}%</div></div></header>`;
+}
+function frame(eyebrow,title,body){
+ const visible=visiblePages(); const pos=visible.findIndex(p=>p.id===pages[current]?.id)+1; const pct=Math.round((pos-1)/Math.max(1,visible.length-1)*100);
+ return `<div class="app">${top(pct)}<main class="screen"><div class="sectionhead"><div><div class="eyebrow">${eyebrow}</div><h2>${title}</h2></div><img src="${LOGO}" alt=""></div>${body}<div id="notice" class="notice"></div></main>${nav()}</div>`;
+}
+function nav(){
+ const p=pages[current]; if(p.id==="review") return `<div class="nav"><button class="btn secondary" onclick="goPrev()">السابق</button><button id="submitBtn" class="btn primary" onclick="submitRequest()">إرسال الطلب</button></div>`;
+ return `<div class="nav"><button class="btn secondary" onclick="${reviewReturn?'backToReview()':'goPrev()'}">${reviewReturn?'العودة للمراجعة':'السابق'}</button><button class="btn primary" onclick="goNext()">التالي</button></div>`;
+}
+function optionGroup(key,items,multi=false,max=null){
+ return `<div class="options">${items.map(o=>{
+  const checked=multi?has(state[key],o.v):state[key]===o.v;
+  return `<label class="option ${checked?'sel':''}"><input type="${multi?'checkbox':'radio'}" ${checked?'checked':''} onchange="pick('${key}','${o.v}',${multi},${max||'null'})"><div class="text"><strong>${o.l}</strong></div></label>`;
+ }).join("")}</div>`;
+}
+function otherBox(show,key,label="اكتب التفاصيل هنا…"){return show?`<div class="field"><input type="text" value="${esc(state[key])}" placeholder="${label}" oninput="setVal('${key}',this.value)"></div>`:""}
+function textField(key,label,placeholder,type="text",optional=false){return `<div class="field"><label>${label}${optional?' <span class="hint">— اختياري</span>':''}</label><input type="${type}" value="${esc(state[key])}" placeholder="${placeholder}" oninput="setVal('${key}',this.value)"></div>`}
+function textArea(key,label,placeholder){return `<div class="field"><label>${label}</label><textarea placeholder="${placeholder}" oninput="setVal('${key}',this.value)">${esc(state[key])}</textarea></div>`}
+function counter(key,label){return `<div class="counter-card"><label>${label}</label><div class="counter"><button type="button" onclick="inc('${key}',-1)">−</button><span>${state[key]}</span><button type="button" onclick="inc('${key}',1)">+</button></div></div>`}
+function setVal(k,v){state[k]=v}
+function inc(k,d){state[k]=Math.max(0,(Number(state[k])||0)+d);render()}
+function pick(k,v,multi,max){
+ if(multi){let arr=[...(state[k]||[])]; if(arr.includes(v))arr=arr.filter(x=>x!==v); else {if(max&&arr.length>=max){showNotice(`يمكن اختيار ${max} خيارات كحد أقصى.`,"error");return} arr.push(v)} state[k]=arr}
+ else state[k]=v;
+ render();
+}
+
+const pages=[
+{id:"start",always:true,render:()=>`<div class="app"><main class="screen dark"><div class="hero"><img src="${LOGO}" alt="OMAR ARCHITECT"><div class="hero-title"><span class="l1">نصغي أولًا …</span><span class="l2">ثم نصمم …</span></div><p>يساعدنا هذا النموذج على فهم مشروعك واحتياجاتك بشكل أولي قبل بدء مرحلة التصميم.</p><button class="btn start" onclick="goNext()">ابدأ الطلب</button></div></main></div>`},
+{id:"service",always:true,render:()=>frame("01","ما الخدمة التي تحتاجها؟",`<p class="lead">يمكنك اختيار أكثر من خدمة.</p>${optionGroup("services",[{v:"arch",l:L.services.arch},{v:"interior",l:L.services.interior},{v:"landscape",l:L.services.landscape}],true)}`)},
+{id:"project",always:true,render:()=>frame("02","ما نوع المشروع؟",optionGroup("projectType",[
+ {v:"villa",l:"فيلا خاصة"},{v:"resthouse",l:"استراحة"},{v:"chalet",l:"شاليه / منزل عطلات"},{v:"duplex",l:"دوبلكس"},{v:"apartment_building",l:"عمارة سكنية"},{v:"apartment",l:"شقة"},{v:"commercial",l:"مشروع تجاري"},{v:"other",l:"أخرى"}
+])+ (state.projectType==="commercial"?`<div class="groupTitle">نوع المشروع التجاري</div>${optionGroup("commercialType",[
+ {v:"office",l:"مكتب"},{v:"restaurant",l:"مطعم / مقهى"},{v:"store",l:"متجر / معرض"},{v:"clinic",l:"عيادة"},{v:"hospitality",l:"مشروع ضيافة"},{v:"building",l:"مبنى تجاري"},{v:"other",l:"أخرى"}])}${otherBox(state.commercialType==="other","otherProject")}`:otherBox(state.projectType==="other","otherProject")))},
+{id:"land",always:true,render:()=>frame("03","معلومات الأرض والموقع",`<p class="lead">يرجى ذكر ما تعرفه عن الأرض والموقع وأي معلومات تراها مهمة للمشروع، وإرفاق الصك أو مخطط الأرض أو أي مستندات متوفرة لديك.</p>${textArea("landInfo","تفاصيل الأرض والموقع","اكتب تفاصيل الأرض والموقع هنا…")}${textField("locationLink","رابط موقع الأرض","Google Maps أو أي رابط للموقع","url",true)}<div class="upload"><strong>إرفاق ملفات أو صور</strong><div class="hint">يمكن رفع أكثر من ملف معًا: PDF، صور، مخططات ومستندات.</div><input id="fileInput" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.heic,.webp,.dwg,.dxf,.doc,.docx" onchange="addFiles(this.files)"><div id="fileList" class="file-list">${renderFileList()}</div></div>`)},
+{id:"usage",cond:()=>isResidential(),render:()=>frame("04","ما هو الاستخدام الرئيسي للمشروع؟",optionGroup("usage",[
+ {v:"primary",l:"مسكن رئيسي"},{v:"secondary",l:"مسكن ثانوي"},{v:"vacation",l:"منزل عطلات / موسمي"},{v:"investment",l:"استثمار"},{v:"shared",l:"استخدام عائلي مشترك"},{v:"other",l:"أخرى"}])+otherBox(state.usage==="other","usageOther"))},
+{id:"family",cond:()=>isResidential(),render:()=>frame("05","أفراد الأسرة",`<p class="lead">كم عدد أفراد الأسرة الذين سيستخدمون المنزل؟</p><div class="counter-grid">${counter("adults","البالغون")}${counter("children","الأطفال")}${counter("specialUsers","كبار السن أو ذوو الهمم")}</div><div class="groupTitle">هل تتوقع زيادة عدد أفراد الأسرة مستقبلًا؟</div>${optionGroup("growth",[{v:"yes",l:"نعم"},{v:"no",l:"لا"},{v:"unsure",l:"غير متأكد"}])}`)},
+{id:"lifestyle",cond:()=>isResidential(),render:()=>frame("06","كيف تصف أسلوب استخدامكم للمنزل؟",`<p class="lead">يمكنك اختيار أكثر من خيار.</p>${optionGroup("lifestyle",[
+ {v:"guests",l:L.lifestyle.guests},{v:"privacy",l:L.lifestyle.privacy},{v:"family_gathering",l:L.lifestyle.family_gathering},{v:"open",l:L.lifestyle.open},{v:"separate",l:L.lifestyle.separate},{v:"workstudy",l:L.lifestyle.workstudy},{v:"other",l:"أخرى"}],true)}${otherBox(has(state.lifestyle,"other"),"lifestyleOther")}`)},
+{id:"spaces",cond:()=>isResidential(),render:()=>frame("07","الفراغات المطلوبة",`<div class="groupTitle">الضيافة</div>${optionGroup("hospitalitySpaces",[
+ {v:"men_majlis",l:"مجلس رجال"},{v:"formal_dining",l:"مقلط / غرفة طعام رسمية"},{v:"women_majlis",l:"مجلس نساء"},{v:"guest_bedroom",l:"غرفة نوم ضيوف"}],true)}<div class="groupTitle">العائلة</div>${optionGroup("familySpaces",[
+ {v:"family_hall",l:"صالة عائلية"},{v:"family_dining",l:"غرفة طعام عائلية"},{v:"living_room",l:"غرفة معيشة"},{v:"office",l:"مكتب / غرفة دراسة"},{v:"playroom",l:"غرفة ألعاب"},{v:"cinema",l:"غرفة ترفيه / سينما"}],true)}<div class="groupTitle">غرف النوم</div>${optionGroup("bedroomSpaces",[
+ {v:"master",l:"جناح رئيسي"},{v:"sons",l:"غرف أبناء"},{v:"daughters",l:"غرف بنات"},{v:"other",l:"أخرى"}],true)}${otherBox(has(state.bedroomSpaces,"other"),"bedroomOther")}`)},
+{id:"bedrooms",cond:()=>isResidential()&&(has(state.bedroomSpaces,"sons")||has(state.bedroomSpaces,"daughters")||has(state.bedroomSpaces,"other")),render:()=>frame("08","كم عدد غرف النوم المطلوبة؟",`<div class="counter-grid">${has(state.bedroomSpaces,"sons")?counter("sonsRooms","عدد غرف الأبناء"):""}${has(state.bedroomSpaces,"daughters")?counter("daughtersRooms","عدد غرف البنات"):""}${has(state.bedroomSpaces,"other")?counter("otherRooms","عدد غرف النوم الأخرى"):""}</div>`)},
+{id:"servicespaces",cond:()=>isResidential(),render:()=>frame("09","ما الفراغات والخدمات الإضافية التي تحتاجها؟",optionGroup("serviceSpaces",[
+ {v:"maid",l:"غرفة عاملة منزلية"},{v:"laundry",l:"غرفة غسيل"},{v:"storage",l:"مستودع"},{v:"driver",l:"غرفة سائق"},{v:"service_entrance",l:"مدخل خدمة مستقل"},{v:"other",l:"أخرى"}],true)+otherBox(has(state.serviceSpaces,"other"),"serviceOther"))},
+{id:"kitchen",cond:()=>isResidential(),render:()=>frame("10","ما نوع المطبخ الذي تفضله؟",optionGroup("kitchenType",[
+ {v:"closed",l:"مطبخ مغلق"},{v:"open",l:"مطبخ مفتوح"},{v:"prep",l:"مطبخ رئيسي + مطبخ تحضيري"},{v:"unsure",l:"غير متأكد"}]))},
+{id:"privacy",cond:()=>isResidential(),render:()=>frame("11","ما مستوى الخصوصية الذي تفضله في المنزل؟",optionGroup("privacy",[
+ {v:"high",l:L.privacy.high},{v:"balanced",l:L.privacy.balanced},{v:"open",l:L.privacy.open},{v:"team",l:L.privacy.team}]))},
+{id:"floors",cond:()=>isResidential(),render:()=>frame("12","الأدوار والمصعد",`<div class="groupTitle">كم عدد الأدوار التي تفضلها للمشروع؟</div>${optionGroup("floors",[
+ {v:"one",l:"دور واحد"},{v:"two",l:"دورين"},{v:"three_plus",l:"ثلاثة أدوار أو أكثر"},{v:"team",l:"أترك ذلك لتوصية فريق التصميم"}])}<div class="groupTitle">هل ترغب بوجود مصعد؟</div>${optionGroup("elevator",[{v:"yes",l:"نعم"},{v:"no",l:"لا"},{v:"unsure",l:"غير متأكد"}])}`)},
+{id:"outdoor",cond:()=>isResidential(),render:()=>frame("13","ما العناصر الخارجية التي ترغب بوجودها في المشروع؟",optionGroup("outdoorSpaces",[
+ {v:"seating",l:"جلسة خارجية"},{v:"winter",l:"جلسة شتوية"},{v:"bbq",l:"منطقة شواء / مطبخ خارجي"},{v:"garden",l:"حديقة ومسطحات خضراء"},{v:"privacy_trees",l:"أشجار للخصوصية"},{v:"pool",l:"مسبح"},{v:"water",l:"عنصر مائي"},{v:"kids",l:"منطقة ألعاب أطفال"},{v:"court",l:"ملعب"},{v:"parking",l:"مواقف سيارات"},{v:"shades",l:"مظلات"},{v:"service_yard",l:"حوش خدمة"},{v:"other",l:"أخرى"}],true)+otherBox(has(state.outdoorSpaces,"other"),"outdoorOther"))},
+{id:"interior",cond:()=>has(state.services,"interior"),render:()=>frame("14","التصميم الداخلي",`<div class="groupTitle">ما نطاق التصميم الداخلي المطلوب؟</div>${optionGroup("interiorScope",[
+ {v:"full",l:"كامل المشروع"},{v:"hospitality",l:"المجالس ومناطق الضيافة"},{v:"living",l:"الصالات وغرف المعيشة"},{v:"bedrooms",l:"غرف النوم"},{v:"kitchen",l:"المطبخ"},{v:"bathrooms",l:"الحمامات"},{v:"office",l:"المكتب / غرفة الدراسة"},{v:"other",l:"أخرى"}],true)}${otherBox(has(state.interiorScope,"other"),"interiorOther")}<div class="groupTitle">حالة المشروع الداخلي</div>${optionGroup("interiorStatus",[{v:"new",l:"مشروع جديد من الصفر"},{v:"existing",l:"مبنى قائم يحتاج إعادة تصميم داخلي"}])}`)},
+{id:"identity",always:true,render:()=>frame("15","التوجه المعماري للمشروع",`<div class="note-card"><strong>التوجه المعماري للمشروع</strong>تخضع الواجهات الخارجية للمشروع للهوية والموجهات المعمارية المعتمدة بحسب موقع الأرض، وذلك وفق الأنظمة والاشتراطات التنظيمية المطبقة على الموقع.<br><br>بعد مراجعة موقع المشروع والمعلومات المرفقة، سيقوم فريق التصميم بتحديد الإطار المعماري المسموح للمشروع، ثم نتواصل معك لاستعراض التوجهات المتاحة ضمن هذا الإطار وفهم تفضيلاتك للوصول إلى التصميم الأقرب لذوقك.</div>`)},
+{id:"priorities",always:true,render:()=>frame("16","ما أهم الأولويات بالنسبة لك في المشروع؟",`<p class="lead">اختر حتى 4 أولويات.</p>${optionGroup("priorities",[
+ {v:"privacy",l:"الخصوصية"},{v:"space_quality",l:"جودة واستغلال المساحات"},{v:"natural_light",l:"الإضاءة الطبيعية"},{v:"comfort",l:"الراحة وسهولة الاستخدام"},{v:"spacious",l:"المساحات الواسعة"},{v:"aesthetic",l:"الطابع الجمالي"},{v:"maintenance",l:"سهولة الصيانة"},{v:"future",l:"المرونة المستقبلية"},{v:"cost",l:"ضبط تكلفة التنفيذ"},{v:"other",l:"أخرى"}],true,4)}${otherBox(has(state.priorities,"other"),"priorityOther")}`)},
+{id:"budget",always:true,render:()=>frame("17","هل لديك ميزانية تقديرية لتنفيذ المشروع؟",optionGroup("budgetStatus",[
+ {v:"defined",l:"نعم، لدي ميزانية محددة"},{v:"range",l:"لدي نطاق تقريبي"},{v:"guidance",l:"لا، وأحتاج إلى توجيه مبدئي"}])+(state.budgetStatus==="defined"||state.budgetStatus==="range"?textField("budgetAmount","الميزانية التقريبية","اكتب الميزانية أو النطاق التقريبي"):""))},
+{id:"timeline",always:true,render:()=>frame("18","متى ترغب في بدء المشروع؟",optionGroup("startTime",[
+ {v:"asap",l:"في أقرب وقت"},{v:"m1_3",l:"خلال 1–3 أشهر"},{v:"m3_6",l:"خلال 3–6 أشهر"},{v:"after6",l:"بعد 6 أشهر"},{v:"none",l:"لا يوجد موعد محدد حاليًا"}])+`<div class="groupTitle">هل لديك موعد مستهدف لإنهاء المشروع أو بدء التنفيذ؟</div>${optionGroup("hasTarget",[{v:"yes",l:"نعم"},{v:"no",l:"لا"}])}${state.hasTarget==="yes"?textField("targetDate","الموعد التقريبي","اكتب الموعد المستهدف"):''}`)},
+{id:"notes",always:true,render:()=>frame("19","ملاحظات إضافية",textArea("notes","هل هناك أي ملاحظات أو متطلبات إضافية ترغب بمشاركتها معنا؟","اكتب أي تفاصيل أو أفكار ترى أنها مهمة للمشروع…"))},
+{id:"contact",always:true,render:()=>frame("20","كيف يمكننا التواصل معك؟",`${textField("fullName","الاسم","الاسم الكامل")}${textField("phone","رقم الجوال","05xxxxxxxx","tel")}${textField("email","البريد الإلكتروني","name@example.com","email",true)}${textField("city","المدينة","الرياض")}<div class="groupTitle">كيف عرفت عنا؟</div>${optionGroup("referral",[{v:"social",l:"وسائل التواصل الاجتماعي"},{v:"person",l:"توصية من شخص"},{v:"previous",l:"عميل سابق"},{v:"other",l:"أخرى"}])}${otherBox(state.referral==="other","referralOther")}`)},
+{id:"review",always:true,render:()=>renderReview()},
+{id:"thanks",always:true,render:()=>`<div class="app"><main class="screen dark"><div class="thanks"><div class="thanks-inner"><div class="check">✓</div><h2>شكرًا لك</h2><p>تم استلام طلبك بنجاح.<br>سيتواصل معك فريق التصميم عند الحاجة إلى أي معلومات إضافية.</p><img src="${LOGO}" alt="OMAR ARCHITECT"><button class="btn home-btn" onclick="location.reload()">العودة للرئيسية</button></div></div></main></div>`}
+];
+
+function visiblePages(){return pages.filter(p=>p.always||!p.cond||p.cond())}
+function render(){
+ const p=pages[current]; if(!p){current=0;return render()}
+ document.getElementById("root").innerHTML=p.render();
+}
+function goNext(){
+ const vis=visiblePages(), idx=vis.findIndex(p=>p.id===pages[current].id); if(idx<0)return;
+ if(!validatePage(pages[current].id))return;
+ const next=vis[Math.min(idx+1,vis.length-1)]; current=pages.indexOf(next); render(); window.scrollTo(0,0);
+}
+function goPrev(){
+ const vis=visiblePages(), idx=vis.findIndex(p=>p.id===pages[current].id);
+ const prev=vis[Math.max(0,idx-1)]; current=pages.indexOf(prev); render(); window.scrollTo(0,0);
+}
+function backToReview(){reviewReturn=false;current=pages.findIndex(p=>p.id==="review");render();window.scrollTo(0,0)}
+function editSection(id){reviewReturn=true;current=pages.findIndex(p=>p.id===id);render();window.scrollTo(0,0)}
+function showNotice(msg,type="error"){const n=document.getElementById("notice");if(n){n.textContent=msg;n.className=`notice show ${type}`;window.scrollTo({top:0,behavior:"smooth"})}}
+function validatePage(id){
+ if(id==="service"&&!state.services.length){showNotice("اختر خدمة واحدة على الأقل.");return false}
+ if(id==="project"&&!state.projectType){showNotice("اختر نوع المشروع.");return false}
+ if(id==="contact"){
+  if(!state.fullName.trim()||!state.phone.trim()||!state.city.trim()){showNotice("يرجى إدخال الاسم ورقم الجوال والمدينة.");return false}
+ }
+ return true;
+}
+function addFiles(files){
+ const incoming=[...files]; for(const f of incoming){if(!selectedFiles.some(x=>x.name===f.name&&x.size===f.size))selectedFiles.push(f)}
+ render();
+}
+function removeFile(i){selectedFiles.splice(i,1);render()}
+function renderFileList(){
+ if(!selectedFiles.length)return `<div class="hint" style="margin-top:10px">لم يتم اختيار ملفات بعد.</div>`;
+ return `<div><strong>${selectedFiles.length} ملفات جاهزة للرفع</strong>${selectedFiles.map((f,i)=>`<div class="file-item"><span>${esc(f.name)} <span class="hint">(${formatBytes(f.size)})</span></span><button type="button" class="file-remove" onclick="removeFile(${i})">حذف</button></div>`).join("")}</div>`;
+}
+function formatBytes(n){if(n<1024)return n+" B";if(n<1048576)return(n/1024).toFixed(1)+" KB";return(n/1048576).toFixed(1)+" MB"}
+
+function reviewData(){
+ const project=state.projectType==="commercial"?(a(L.project,state.projectType)+" — "+a(L.commercial,state.commercialType)):a(L.project,state.projectType);
+ const residential=isResidential();
+ const rows=[
+  {id:"service",title:"الخدمة المطلوبة",value:list(L.services,state.services)},
+  {id:"project",title:"نوع المشروع",value:project},
+  {id:"land",title:"الأرض والموقع",value:`${state.landInfo||"لم تذكر تفاصيل"}${state.locationLink?`\n${state.locationLink}`:""}`},
+ ];
+ if(residential){
+  rows.push(
+   {id:"usage",title:"الاستخدام الرئيسي",value:a(L.usage,state.usage)},
+   {id:"family",title:"الأسرة",value:`البالغون: ${state.adults} — الأطفال: ${state.children} — كبار السن/ذوو الهمم: ${state.specialUsers}\nزيادة مستقبلية: ${a(L.growth,state.growth)}`},
+   {id:"lifestyle",title:"أسلوب الاستخدام",value:list(L.lifestyle,state.lifestyle)},
+   {id:"spaces",title:"الفراغات",value:`الضيافة: ${list(L.hospitality,state.hospitalitySpaces)}\nالعائلة: ${list(L.family,state.familySpaces)}\nغرف النوم: ${list(L.bedroom,state.bedroomSpaces)}`},
+   {id:"servicespaces",title:"الخدمات",value:list(L.serviceSpaces,state.serviceSpaces)},
+   {id:"kitchen",title:"المطبخ",value:a(L.kitchen,state.kitchenType)},
+   {id:"privacy",title:"الخصوصية",value:a(L.privacy,state.privacy)},
+   {id:"floors",title:"الأدوار والمصعد",value:`${a(L.floors,state.floors)} — المصعد: ${a(L.elevator,state.elevator)}`},
+   {id:"outdoor",title:"المساحات الخارجية",value:list(L.outdoor,state.outdoorSpaces)}
+  );
+ }
+ if(has(state.services,"interior"))rows.push({id:"interior",title:"التصميم الداخلي",value:`${list(L.interior,state.interiorScope)} — ${a(L.interiorStatus,state.interiorStatus)}`});
+ rows.push(
+  {id:"identity",title:"التوجه المعماري",value:"يتم تحديد الإطار المعماري وفق الأنظمة والموجهات المعتمدة بحسب موقع المشروع."},
+  {id:"priorities",title:"الأولويات",value:list(L.priority,state.priorities)},
+  {id:"budget",title:"الميزانية",value:`${a(L.budget,state.budgetStatus)}${state.budgetAmount?` — ${state.budgetAmount}`:""}`},
+  {id:"timeline",title:"الجدول الزمني",value:`${a(L.start,state.startTime)}${state.hasTarget==="yes"&&state.targetDate?` — ${state.targetDate}`:""}`},
+  {id:"notes",title:"الملاحظات",value:state.notes||"لا توجد ملاحظات إضافية"},
+  {id:"contact",title:"بيانات التواصل",value:`${state.fullName} — ${state.phone}${state.email?` — ${state.email}`:""} — ${state.city}`}
+ );
+ return rows;
+}
+function renderReview(){
+ const body=`<p class="lead">راجع معلوماتك قبل الإرسال، ويمكنك تعديل أي قسم مباشرة.</p><div class="review">${reviewData().map(r=>`<div class="review-card"><div class="review-top"><b>${r.title}</b><button class="edit-link" onclick="editSection('${r.id}')">تعديل</button></div><span>${esc(r.value)}</span></div>`).join("")}</div><div id="notice" class="notice"></div>`;
+ return frame("21","مراجعة الطلب",body);
+}
+
+function allAnswers(uploaded,submissionId){
+ return {...state,attachments:uploaded,submission_id:submissionId};
+}
+async function uploadFiles(submissionId){
+ const uploaded=[];
+ for(const f of selectedFiles){
+  const safe=f.name.replace(/[^\w.\-\u0600-\u06FF]+/g,"_");
+  const path=`${submissionId}/${Date.now()}_${Math.random().toString(36).slice(2,8)}_${safe}`;
+  const res=await fetch(`${SUPABASE_URL}/storage/v1/object/project-documents/${encodePath(path)}`,{
+   method:"POST",headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,"Content-Type":f.type||"application/octet-stream","x-upsert":"false"},body:f
+  });
+  if(!res.ok)throw new Error(`تعذر رفع الملف ${f.name}`);
+  uploaded.push({name:f.name,path,size:f.size,type:f.type||"application/octet-stream"});
+ }
+ return uploaded;
+}
+function encodePath(p){return p.split("/").map(encodeURIComponent).join("/")}
+
+function pdfRow(label,value,ltr=false){
+ return `<div class="pdf-row"><div class="pdf-value ${ltr?"ltr":""}">${esc(value||"—")}</div><div class="pdf-label">${esc(label)}</div></div>`;
+}
+function pdfSection(title,rows){
+ return `<section class="pdf-section"><h3>${title}</h3><div class="pdf-card">${rows.join("")}</div></section>`;
+}
+function buildBrief(projectNumber,team=false,uploaded=[]){
+ const project=state.projectType==="commercial"?(a(L.project,state.projectType)+" — "+a(L.commercial,state.commercialType)):a(L.project,state.projectType);
+ const sections=[];
+ if(!team){
+  sections.push(pdfSection("معلومات العميل",[
+   pdfRow("اسم العميل",state.fullName),
+   pdfRow("رقم الجوال",state.phone,true),
+   pdfRow("البريد الإلكتروني",state.email||"غير مذكور",true),
+   pdfRow("كيف عرف عنا",a(L.referral,state.referral)+(state.referral==="other"&&state.referralOther?` — ${state.referralOther}`:""))
+  ]));
+ }
+ sections.push(pdfSection("نطاق المشروع",[
+  pdfRow("نوع المشروع",project),
+  pdfRow("الخدمات المطلوبة",list(L.services,state.services)),
+  pdfRow("المدينة",state.city),
+  pdfRow("رابط موقع الأرض",state.locationLink||"غير مذكور",true),
+  pdfRow("معلومات الأرض والموقع",state.landInfo||"غير مذكور")
+ ]));
+ if(isResidential()){
+  sections.push(pdfSection("الأسرة وأسلوب الاستخدام",[
+   pdfRow("الاستخدام الرئيسي",a(L.usage,state.usage)+(state.usage==="other"&&state.usageOther?` — ${state.usageOther}`:"")),
+   pdfRow("أفراد الأسرة",`${state.adults} بالغين، ${state.children} أطفال، ${state.specialUsers} من كبار السن أو ذوي الهمم`),
+   pdfRow("زيادة مستقبلية متوقعة",a(L.growth,state.growth)),
+   pdfRow("أسلوب الاستخدام",list(L.lifestyle,state.lifestyle)+(state.lifestyleOther?` — ${state.lifestyleOther}`:""))
+  ]));
+  sections.push(pdfSection("البرنامج المعماري",[
+   pdfRow("الضيافة",list(L.hospitality,state.hospitalitySpaces)),
+   pdfRow("الفراغات العائلية",list(L.family,state.familySpaces)),
+   pdfRow("غرف النوم",list(L.bedroom,state.bedroomSpaces)+(state.bedroomOther?` — ${state.bedroomOther}`:"")),
+   ...(has(state.bedroomSpaces,"sons")?[pdfRow("عدد غرف الأبناء",String(state.sonsRooms))]:[]),
+   ...(has(state.bedroomSpaces,"daughters")?[pdfRow("عدد غرف البنات",String(state.daughtersRooms))]:[]),
+   ...(has(state.bedroomSpaces,"other")?[pdfRow("عدد غرف النوم الأخرى",String(state.otherRooms))]:[]),
+   pdfRow("الخدمات الإضافية",list(L.serviceSpaces,state.serviceSpaces)+(state.serviceOther?` — ${state.serviceOther}`:"")),
+   pdfRow("نوع المطبخ",a(L.kitchen,state.kitchenType)),
+   pdfRow("الخصوصية",a(L.privacy,state.privacy)),
+   pdfRow("عدد الأدوار",a(L.floors,state.floors)),
+   pdfRow("المصعد",a(L.elevator,state.elevator))
+  ]));
+  sections.push(pdfSection("المساحات الخارجية",[pdfRow("العناصر المطلوبة",list(L.outdoor,state.outdoorSpaces)+(state.outdoorOther?` — ${state.outdoorOther}`:""))]));
+ }
+ if(has(state.services,"interior")){
+  sections.push(pdfSection("التصميم الداخلي",[
+   pdfRow("النطاق",list(L.interior,state.interiorScope)+(state.interiorOther?` — ${state.interiorOther}`:"")),
+   pdfRow("حالة المشروع الداخلي",a(L.interiorStatus,state.interiorStatus))
+  ]));
+ }
+ sections.push(pdfSection("الأولويات والميزانية",[
+  pdfRow("الأولويات",list(L.priority,state.priorities)+(state.priorityOther?` — ${state.priorityOther}`:"")),
+  pdfRow("حالة الميزانية",a(L.budget,state.budgetStatus)),
+  pdfRow("الميزانية التقريبية",state.budgetAmount||"غير محددة")
+ ]));
+ sections.push(pdfSection("الجدول الزمني",[
+  pdfRow("موعد البدء",a(L.start,state.startTime)),
+  pdfRow("الموعد المستهدف",state.hasTarget==="yes"?(state.targetDate||"نعم — لم يحدد الموعد"):"لا يوجد موعد مستهدف")
+ ]));
+ sections.push(pdfSection("الملاحظات",[pdfRow("ملاحظات إضافية",state.notes||"لا توجد ملاحظات إضافية")]));
+ sections.push(pdfSection("المرفقات",[pdfRow("الملفات المرفقة",uploaded.length?uploaded.map(x=>x.name).join("، "):"لا توجد مرفقات")]));
+ sections.push(`<section class="pdf-section"><h3>التوجه المعماري</h3><div class="pdf-note">تخضع الواجهات الخارجية للمشروع للهوية والموجهات المعمارية المعتمدة بحسب موقع الأرض، وذلك وفق الأنظمة والاشتراطات التنظيمية المطبقة على الموقع. بعد مراجعة موقع المشروع والمعلومات المرفقة، سيقوم فريق التصميم بتحديد الإطار المعماري المسموح للمشروع، ثم استعراض التوجهات المتاحة ضمن هذا الإطار.</div></section>`);
+ sections.push(`<section class="pdf-section"><h3>الخطوة التالية</h3><div class="pdf-note">مراجعة معلومات الأرض والموقع والمرفقات، ثم استكمال التوجه التصميمي والمتطلبات الناقصة قبل بدء مرحلة التصميم.</div></section>`);
+
+ const title=team?"ملخص المشروع التصميمي":"ملخص العميل والمشروع";
+ const sub=team?"Design Brief":"Client & Project Brief · Internal";
+ return `<div class="pdf-sheet"><div class="pdf-header"><img class="pdf-logo" src="${LOGO}"><div class="pdf-id"><small>PROJECT BRIEF</small><strong>${projectNumber}</strong></div></div><div class="pdf-hero"><h1>${title}</h1><p>${sub}</p></div><div class="pdf-summary"><div class="box"><div class="lab">المدينة</div><div class="val">${esc(state.city||"—")}</div></div><div class="box"><div class="lab">نوع المشروع</div><div class="val">${esc(project)}</div></div><div class="box"><div class="lab">الخدمات</div><div class="val">${esc(list(L.services,state.services))}</div></div></div>${sections.join("")}<div class="pdf-footer">${team?"DESIGN BRIEF": "CONFIDENTIAL · INTERNAL USE"}</div></div>`;
+}
+async function ensureHtml2Pdf(){
+ if(window.html2pdf) return;
+ const urls=[
+  "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js",
+  "https://unpkg.com/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"
+ ];
+ let lastError;
+ for(const url of urls){
+  try{
+   await new Promise((resolve,reject)=>{
+    const script=document.createElement("script");
+    script.src=url; script.async=true;
+    script.onload=()=>resolve();
+    script.onerror=()=>reject(new Error("PDF library failed to load"));
+    document.head.appendChild(script);
+   });
+   if(window.html2pdf) return;
+  }catch(e){ lastError=e; }
+ }
+ throw lastError||new Error("تعذر تحميل أداة إنشاء PDF");
+}
+
+async function htmlToPdfBlob(html,name){
+ await ensureHtml2Pdf();
+ const stage=document.getElementById("pdfStage");stage.innerHTML=html;
+ const el=stage.firstElementChild;
+ const options={margin:0,filename:name,image:{type:"jpeg",quality:.95},html2canvas:{scale:1.55,useCORS:true,backgroundColor:"#ffffff",logging:false},jsPDF:{unit:"pt",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:[".pdf-section"]}};
+ const worker=html2pdf().set(options).from(el).toPdf();
+ const pdf=await worker.outputPdf("blob");
+ stage.innerHTML="";
+ return pdf;
+}
+async function uploadBrief(blob,path){
+ const res=await fetch(`${SUPABASE_URL}/storage/v1/object/project-briefs/${encodePath(path)}`,{
+  method:"POST",headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,"Content-Type":"application/pdf","x-upsert":"true"},body:blob
+ });
+ if(!res.ok)throw new Error("تعذر حفظ ملف الـPDF");
+}
+async function notify(requestId,submissionId){
+ const url=`${SUPABASE_URL}/functions/v1/send-project-notification`;
+ let last;
+ for(let i=0;i<2;i++){
+  try{
+   const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_KEY},body:JSON.stringify({request_id:requestId,submission_id:submissionId})});
+   if(r.ok)return await r.json(); last=await r.text();
+  }catch(e){last=e}
+  await new Promise(r=>setTimeout(r,900));
+ }
+ throw new Error("تم حفظ الطلب، لكن تعذر إرسال إشعار البريد تلقائيًا.");
+}
+
+async function submitRequest(){
+ if(!validatePage("contact"))return;
+ const btn=document.getElementById("submitBtn"); if(btn){btn.disabled=true;btn.textContent="جارٍ إرسال الطلب…"}
+ try{
+  const submissionId=crypto.randomUUID();
+  const uploaded=await uploadFiles(submissionId);
+  const payload={
+   client_name:state.fullName.trim(),phone:state.phone.trim(),email:state.email.trim()||null,
+   project_type:state.projectType,services:state.services,location_link:state.locationLink.trim()||null,status:"new",
+   answers:allAnswers(uploaded,submissionId)
+  };
+  const res=await fetch(`${SUPABASE_URL}/rest/v1/client_requests`,{
+   method:"POST",headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,"Content-Type":"application/json","Prefer":"return=representation"},body:JSON.stringify(payload)
+  });
+  if(!res.ok)throw new Error("تعذر حفظ الطلب. حاول مرة أخرى.");
+  const rows=await res.json(); const request=rows?.[0]; if(!request?.id)throw new Error("تم الحفظ لكن تعذر إنشاء رقم الطلب.");
+  const projectNumber=`OA-${new Date().getFullYear()}-${String(request.id).padStart(3,"0")}`;
+  const internalPath=`${submissionId}/${projectNumber}_Client_Project_Brief.pdf`;
+  const teamPath=`${submissionId}/${projectNumber}_Design_Brief.pdf`;
+  const internalBlob=await htmlToPdfBlob(buildBrief(projectNumber,false,uploaded),`${projectNumber}_Client_Project_Brief.pdf`);
+  const teamBlob=await htmlToPdfBlob(buildBrief(projectNumber,true,uploaded),`${projectNumber}_Design_Brief.pdf`);
+  await uploadBrief(internalBlob,internalPath);
+  await uploadBrief(teamBlob,teamPath);
+  try{await notify(request.id,submissionId)}catch(e){console.error(e)}
+  current=pages.findIndex(p=>p.id==="thanks");reviewReturn=false;render();window.scrollTo(0,0);
+ }catch(e){
+  console.error(e);showNotice(e.message||"حدث خطأ أثناء الإرسال.","error");
+  if(btn){btn.disabled=false;btn.textContent="إرسال الطلب"}
+ }
+}
+render();
+</script>
+</body>
+</html>
