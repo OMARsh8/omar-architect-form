@@ -435,7 +435,7 @@ async function htmlToPdfBlob(html,name){
 }
 async function uploadBrief(blob,path){
  const res=await fetch(`${SUPABASE_URL}/storage/v1/object/project-briefs/${encodePath(path)}`,{
-  method:"POST",headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,"Content-Type":"application/pdf","x-upsert":"true"},body:blob
+  method:"POST",headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,"Content-Type":"application/pdf","x-upsert":"false"},body:blob
  });
  if(!res.ok)throw new Error("تعذر حفظ ملف الـPDF");
 }
