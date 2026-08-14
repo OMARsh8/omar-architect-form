@@ -452,22 +452,44 @@ async function notify(requestId,submissionId){
  throw new Error("تم حفظ الطلب، لكن تعذر إرسال إشعار البريد تلقائيًا.");
 }
 
+function makeSubmissionId(){
+ if(window.crypto && typeof window.crypto.randomUUID==="function") return window.crypto.randomUUID();
+ const a=new Uint8Array(16);
+ if(window.crypto && window.crypto.getRandomValues) window.crypto.getRandomValues(a);
+ else for(let i=0;i<16;i++) a[i]=Math.floor(Math.random()*256);
+ a[6]=(a[6]&15)|64; a[8]=(a[8]&63)|128;
+ const h=[...a].map(b=>b.toString(16).padStart(2,"0")).join("");
+ return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;
+}
+
 async function submitRequest(){
  if(!validatePage("contact"))return;
  const btn=document.getElementById("submitBtn"); if(btn){btn.disabled=true;btn.textContent="جارٍ إرسال الطلب…"}
  try{
-  const submissionId=crypto.randomUUID();
+  const submissionId=makeSubmissionId();
   const uploaded=await uploadFiles(submissionId);
-  const payload={
-   client_name:state.fullName.trim(),phone:state.phone.trim(),email:state.email.trim()||null,
-   project_type:state.projectType,services:state.services,location_link:state.locationLink.trim()||null,status:"new",
-   answers:allAnswers(uploaded,submissionId)
-  };
-  const res=await fetch(`${SUPABASE_URL}/rest/v1/client_requests`,{
-   method:"POST",headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,"Content-Type":"application/json","Prefer":"return=representation"},body:JSON.stringify(payload)
+  const answers=allAnswers(uploaded,submissionId);
+  const res=await fetch(`${SUPABASE_URL}/rest/v1/rpc/submit_client_request`,{
+   method:"POST",
+   headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,"Content-Type":"application/json"},
+   body:JSON.stringify({
+    p_client_name:state.fullName.trim(),
+    p_phone:state.phone.trim(),
+    p_email:state.email.trim()||null,
+    p_project_type:state.projectType,
+    p_services:state.services,
+    p_location_link:state.locationLink.trim()||null,
+    p_answers:answers
+   })
   });
-  if(!res.ok)throw new Error("تعذر حفظ الطلب. حاول مرة أخرى.");
-  const rows=await res.json(); const request=rows?.[0]; if(!request?.id)throw new Error("تم الحفظ لكن تعذر إنشاء رقم الطلب.");
+  if(!res.ok){
+   const detail=await res.text();
+   console.error("submit_client_request RPC failed:",detail);
+   throw new Error("تعذر حفظ الطلب. تأكد من تنفيذ كود الربط في Supabase ثم حاول مرة أخرى.");
+  }
+  const requestId=await res.json();
+  if(!requestId)throw new Error("تم الحفظ لكن تعذر إنشاء رقم الطلب.");
+  const request={id:Number(requestId)};
   const projectNumber=`OA-${new Date().getFullYear()}-${String(request.id).padStart(3,"0")}`;
   const internalPath=`${submissionId}/${projectNumber}_Client_Project_Brief.pdf`;
   const teamPath=`${submissionId}/${projectNumber}_Design_Brief.pdf`;
